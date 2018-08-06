@@ -17,8 +17,8 @@ Runner::Runner(int numLeds, CRGB * leds) : EffectLED(numLeds, leds)
 	static uint8_t num = 0; 
 	this->color.setRGB(255,255,0); 
 	//this-> color.setColorCode (0); 
-	this-> size = 1; 
-	this-> period = 1000;  
+	this-> size = 0; 
+	this-> period =-1;  
 	this->effectName = "Runner ";
 	this->effectName.concat(num++);   
 }
@@ -74,17 +74,10 @@ void Runner::run() {
   Parsing the command and associate value received from CLI user 
  */
 
-String Runner::parseCommand (char*  cmd) {
+String Runner::parseCommand (char*  cmd, char* sep) {
 
 String res = String (effectName);
 	
- char* sep = strchr(cmd,':');      // pointer to separator 
-  if (sep){
-    *sep = '\0';                    // end string , devide two parts original string 
-    ++sep;
-
-    trimStr (cmd); // Remove Spaces From CMD
-    trimStr (sep); // Remove Spaces From value
 
     // set parameter on effect 
     if (strcmp(cmd,RUNNER_PERIOD) == 0){      // period  : 100
@@ -98,15 +91,10 @@ String res = String (effectName);
     } 
 
     else {
-      return (res+"Undefined Command");
+      return (res+" Undefined Command");
     }
-
-  }
-  else {
-    return (res+"Error enter command. Format CMD : value ");
-  }
    
-  return res+"\t>>"+String(cmd)+" : "+String(sep);
+  return res+"\t>> "+String(cmd)+" : "+String(sep);
 }
 
 

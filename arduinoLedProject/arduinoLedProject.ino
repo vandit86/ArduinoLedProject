@@ -8,7 +8,7 @@
 #define DATA_PIN 5
 #define CLOCK_PIN 7
 
-#define BRIGHTNESS  5
+#define BRIGHTNESS  50
 
 // command max size  
 #define CMD_SIZE 127       // max size of command from CLI 
@@ -25,7 +25,9 @@ char inputCmd[CMD_SIZE + 1]={
 // constants Runner 
 char * const EFFECT_NEW = "new" ;       // new effect 
 char * const EFFECT_LIST = "list" ; 
-char * const EFFECT_DEL = "del" ; 
+char * const EFFECT_DEL = "del" ;
+char * const EFFECT_SET = "set";
+char * const EFFECT_END = "end";
 
 EffectLED* effList [LIST_SIZE] = {
   NULL};      // list of effects  
@@ -34,11 +36,11 @@ unsigned long previousMillis = 0;        // will store last time LED was updated
 const long interval = 5000;           // interval at which to blink (milliseconds)
 
 uint8_t exePos = 0;                  // execution position on array 
-EffectLED* runner = 0;  // effect to be executed on this step 
+EffectLED* runner,*runnerSet = 0;  // effect to be executed on this step and configured
 
 //EffectLED eLed 
-Runner runner_0 (NUM_LEDS, leds); 
-Runner runner_1 (NUM_LEDS, leds); 
+//Runner runner_0 (NUM_LEDS, leds); 
+//Runner runner_1 (NUM_LEDS, leds); 
 
 void setup() { 
   // Uncomment/edit one of the following lines for your leds arrangement.
@@ -75,7 +77,7 @@ void setup() {
 
 
 
-  // FastLED.setBrightness(  BRIGHTNESS );
+  FastLED.setBrightness(  BRIGHTNESS );
 
 
   FastLED.addLeds<WS2801, DATA_PIN, CLOCK_PIN, RBG>(leds, NUM_LEDS); 
@@ -84,10 +86,9 @@ void setup() {
   // serial communication 
   Serial.begin(9600);           // set up Serial library at 9600 bps
   Serial.println("Ready To Receive Command's.");  // prints hello with ending line break 
-  Serial.println(runner_0.getName().c_str());  
 
-  effList[0] = &runner_0;
-  effList[1] = &runner_1;  
+  //effList[0] = &runner_0;
+  //effList[1] = &runner_1;  
 
 }
 
@@ -111,7 +112,7 @@ void loop() {
 
   if (runner) {
     runner->run();
-    Serial.println(runner->getName().c_str());
+    //Serial.println(runner->getName().c_str());
   }
 
 
@@ -124,7 +125,9 @@ void loop() {
     byte size = Serial.readBytes(inputCmd, CMD_SIZE);
     // Add the final 0 to end the C string
     inputCmd[size] = 0;
-    Serial.println(runner->parseCommand(inputCmd).c_str()); //  // parsing command
+    //if (runnerSet)
+    //  Serial.println(runnerSet->parseCommand(inputCmd).c_str()); //  // parsing command
+    parseCommand(inputCmd); 
 
   }
 
@@ -147,14 +150,29 @@ void parseCommand (char*  cmd) {
     // set parameter on effect 
     if (strcmp(cmd,EFFECT_NEW) == 0){     
       int pos = insertEffect( new Runner (NUM_LEDS, leds));       // add new runner effect to the list of effects 
-      Serial.println(pos); 
+
+        if (pos <0) Serial.println("error to insert new effect");
+      else  Serial.println(effList[pos]->getName()); 
 
     }
+    else if (strcmp(cmd,EFFECT_SET) == 0){      // start of configuration
+      uint32_t pos = (uint32_t)atoi(sep); 
+      if (pos < LIST_SIZE)
+        runnerSet = effList[pos]; 
+    }
+    else if (strcmp(cmd,EFFECT_END) == 0){      // end of configuration 
+      Serial.println ("SET is Done");
+      runnerSet = NULL; 
+    }
+
     else if (strcmp(cmd,EFFECT_LIST) == 0){      // size  : 100
-      // 
+      listEffects(); 
     }
     else if (strcmp(cmd,EFFECT_DEL) == 0){      // color  : 100
       //setColor ((uint32_t)strtol(sep, NULL, 16));   
+    }
+    else if (runnerSet) {
+        Serial.println(runnerSet->parseCommand(cmd,sep).c_str()); //  // parsing command
     } 
 
     else {
@@ -192,6 +210,22 @@ int insertEffect (EffectLED* eff){
   }
   return -1 ; // if no more space on array 
 }
+
+
+// list all effects 
+void listEffects (){
+  int j =0; 
+  for (int i = 0; i < LIST_SIZE; i++){
+    if ( effList[i]){
+      ++j; 
+      Serial.println (effList[i]->getName().c_str()); 
+    }  
+  }
+
+  if (j == 0) Serial.println("empty list "); 
+}
+
+
 
 
 

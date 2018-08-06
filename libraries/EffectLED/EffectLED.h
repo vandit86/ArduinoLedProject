@@ -14,7 +14,7 @@ public :
   void setNumLeds (int);  
   virtual String getName() = 0;   // virtual function to return name of the effect 
   virtual void run() = 0; 		  // derived class defines whatto do 
-  virtual String parseCommand (char*  cmd)=0; 
+  virtual String parseCommand (char*  cmd, char* val)=0; 
   
 protected : 
  	int NUM_LEDS;			// number of leds 

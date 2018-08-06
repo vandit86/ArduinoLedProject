@@ -16,7 +16,7 @@ class Runner : public EffectLED {
 		~Runner (){}  
 		virtual String getName(); 
 		virtual void run();
-		String parseCommand (char*  cmd); 
+		String parseCommand (char*  cmd, char* val); 
 		void setPeriod(uint32_t);  
 		void setSize(uint32_t);
 		void setColor(uint32_t);   
