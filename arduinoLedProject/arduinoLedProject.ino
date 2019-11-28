@@ -1,3 +1,5 @@
+
+
 #include "FastLED.h"
 #include "EffectLED.h"
 #include "Runner.h"
@@ -5,8 +7,9 @@
 // How many leds in your strip?
 #define NUM_LEDS 31
 
-#define DATA_PIN 5
-#define CLOCK_PIN 7
+// GND to common GND 
+#define DATA_PIN 5    // SI 
+#define CLOCK_PIN 7   // CLK
 
 #define BRIGHTNESS  50
 
@@ -18,19 +21,17 @@
 // buffers 
 CRGB leds[NUM_LEDS];                                        // LED Array    
 // Get next command from Serial (add 1 for final 0)
-char inputCmd[CMD_SIZE + 1]={
-  0  };                           // byffer to read command from CLI 
+char inputCmd[CMD_SIZE + 1]={ 0 };                           // byffer to read command from CLI 
 
 
 // constants Runner 
-char * const EFFECT_NEW = "new" ;       // new effect 
-char * const EFFECT_LIST = "list" ; 
-char * const EFFECT_DEL = "del" ;
+char * const EFFECT_NEW = "new" ;       // new effect (example new:  -> create new Runner effect )
+char * const EFFECT_LIST = "list" ;     // new effect (example list:  -> show list of effects )
+char * const EFFECT_DEL = "del" ;       // new effect (example del:1  -> delete first effect on list)
 char * const EFFECT_SET = "set";
 char * const EFFECT_END = "end";
 
-EffectLED* effList [LIST_SIZE] = {
-  NULL};      // list of effects  
+EffectLED* effList [LIST_SIZE] = {  NULL };      // list of effects  
 
 unsigned long previousMillis = 0;        // will store last time LED was updated
 const long interval = 5000;           // interval at which to blink (milliseconds)
@@ -38,49 +39,15 @@ const long interval = 5000;           // interval at which to blink (millisecond
 uint8_t exePos = 0;                  // execution position on array 
 EffectLED* runner,*runnerSet = 0;  // effect to be executed on this step and configured
 
-//EffectLED eLed 
+//EffectLED eLed for tests
 //Runner runner_0 (NUM_LEDS, leds); 
 //Runner runner_1 (NUM_LEDS, leds); 
 
 void setup() { 
-  // Uncomment/edit one of the following lines for your leds arrangement.
-  // FastLED.addLeds<TM1803, DATA_PIN, RGB>(leds, NUM_LEDS);
-  // FastLED.addLeds<TM1804, DATA_PIN, RGB>(leds, NUM_LEDS);
-  // FastLED.addLeds<TM1809, DATA_PIN, RGB>(leds, NUM_LEDS);
-  // FastLED.addLeds<WS2811, DATA_PIN, RGB>(leds, NUM_LEDS);
-  // FastLED.addLeds<WS2812, DATA_PIN, RGB>(leds, NUM_LEDS);
-  // FastLED.addLeds<WS2812B, DATA_PIN, RGB>(leds, NUM_LEDS);
-  // FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);
-  // FastLED.addLeds<APA104, DATA_PIN, RGB>(leds, NUM_LEDS);
-  // FastLED.addLeds<UCS1903, DATA_PIN, RGB>(leds, NUM_LEDS);
-  // FastLED.addLeds<UCS1903B, DATA_PIN, RGB>(leds, NUM_LEDS);
-  // FastLED.addLeds<GW6205, DATA_PIN, RGB>(leds, NUM_LEDS);
-  // FastLED.addLeds<GW6205_400, DATA_PIN, RGB>(leds, NUM_LEDS);
-
-  // FastLED.addLeds<WS2801, RGB>(leds, NUM_LEDS);
-  // FastLED.addLeds<SM16716, RGB>(leds, NUM_LEDS);
-  // FastLED.addLeds<LPD8806, RGB>(leds, NUM_LEDS);
-  // FastLED.addLeds<P9813, RGB>(leds, NUM_LEDS);
-  // FastLED.addLeds<APA102, RGB>(leds, NUM_LEDS);
-  // FastLED.addLeds<DOTSTAR, RGB>(leds, NUM_LEDS);
-
-
-  //  FastLED.addLeds<WS2801, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS);
-
-  //FastLED.addLeds<WS2801, DATA_PIN, CLOCK_PIN, RBG>(leds, NUM_LEDS);   /// TODO :: controller ; RBG ; data pin ; clockpin ... pass to constructor of effect class 
-
-  // FastLED.addLeds<SM16716, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS);
-  // FastLED.addLeds<LPD8806, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS);
-  // FastLED.addLeds<P9813, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS);
-  // FastLED.addLeds<APA102, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS);
-  // FastLED.addLeds<DOTSTAR, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS);
-
-
 
   FastLED.setBrightness(  BRIGHTNESS );
-
-
-  FastLED.addLeds<WS2801, DATA_PIN, CLOCK_PIN, RBG>(leds, NUM_LEDS); 
+  FastLED.addLeds<WS2801, DATA_PIN, CLOCK_PIN, RBG>(leds, NUM_LEDS);
+  //FastLED.clearData();  
 
 
   // serial communication 
@@ -125,8 +92,7 @@ void loop() {
     byte size = Serial.readBytes(inputCmd, CMD_SIZE);
     // Add the final 0 to end the C string
     inputCmd[size] = 0;
-    //if (runnerSet)
-    //  Serial.println(runnerSet->parseCommand(inputCmd).c_str()); //  // parsing command
+   
     parseCommand(inputCmd); 
 
   }
@@ -147,18 +113,18 @@ void parseCommand (char*  cmd) {
     trimStr (cmd); // Remove Spaces From CMD
     trimStr (sep); // Remove Spaces From value
 
-    // set parameter on effect 
+    //  create new effect 
     if (strcmp(cmd,EFFECT_NEW) == 0){     
-      int pos = insertEffect( new Runner (NUM_LEDS, leds));       // add new runner effect to the list of effects 
-
-        if (pos <0) Serial.println("error to insert new effect");
-      else  Serial.println(effList[pos]->getName()); 
-
+      EffectLED* effect =  new Runner (NUM_LEDS, leds); 
+      insertEffect( effect );       // add new runner effect to the list of effects 
     }
     else if (strcmp(cmd,EFFECT_SET) == 0){      // start of configuration
       uint32_t pos = (uint32_t)atoi(sep); 
       if (pos < LIST_SIZE)
         runnerSet = effList[pos]; 
+        Serial.print ("Configuring : " );
+        Serial.println (runnerSet->getName()); 
+        Serial.println (runnerSet->getListConfigParams().c_str()); // show list of configurable params of effect  
     }
     else if (strcmp(cmd,EFFECT_END) == 0){      // end of configuration 
       Serial.println ("SET is Done");
@@ -169,23 +135,20 @@ void parseCommand (char*  cmd) {
       listEffects(); 
     }
     else if (strcmp(cmd,EFFECT_DEL) == 0){      // color  : 100
-      //setColor ((uint32_t)strtol(sep, NULL, 16));   
+      deleteEffect(atoi(sep)) ;   
     }
     else if (runnerSet) {
         Serial.println(runnerSet->parseCommand(cmd,sep).c_str()); //  // parsing command
     } 
-
     else {
       Serial.println ("Undefined Command");
     }
-
   }
   else {
     Serial.println ("Error enter command");
   }
 
 }
-
 
 // Auxiliary function 
 // Remove Spaces From String
@@ -200,53 +163,55 @@ void trimStr (char* str){
 }
 
 
-// insert new effect into array , find the empty position insert effect and return position or -1 if array is full  
-int insertEffect (EffectLED* eff){
+// insert new effect into array , find the empty position insert effect 
+void insertEffect (EffectLED* eff){
   for (int i = 0; i < LIST_SIZE; i++){
     if ( !effList[i]){
       effList[i] = eff;
-      return i;  
+      Serial.print ("New Effect : "); 
+      Serial.print ( eff->getName()); 
+      Serial.print (", inserted into position : "); 
+      Serial.println(i); 
+      return;  
     }  
   }
-  return -1 ; // if no more space on array 
+  Serial.println("error to insert new effect: no more space for new effects"); 
 }
 
 
-// list all effects 
+// print all running effects effects 
 void listEffects (){
   int j =0; 
+  Serial.println("All running effects effects : "); 
   for (int i = 0; i < LIST_SIZE; i++){
     if ( effList[i]){
+      Serial.print("[");
+      Serial.print(i);  
+      Serial.print("]");
+      Serial.print("\t");
+      Serial.println (effList[i]->getName().c_str());
       ++j; 
-      Serial.println (effList[i]->getName().c_str()); 
     }  
   }
 
-  if (j == 0) Serial.println("empty list "); 
+  if (j == 0) Serial.println("List of effects is empty "); 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// realize del effect 
+void deleteEffect (int num){
+  if (num<0 || num >= LIST_SIZE){
+    Serial.print (num); 
+    Serial.println ("\t is out of range");  
+  }
+  else if (effList[num] == NULL){
+    Serial.print (num); 
+    Serial.println ("\t effect is not exists");
+  }
+  else if (effList[num] != NULL){
+    delete effList[num];              // release memmory alocated for this effect 
+    effList[num] = NULL;              // release the position on effect list array 
+    Serial.print (num); 
+    Serial.println ("\t is delated"); 
+  }
+  return ;  
+}
