@@ -41,7 +41,6 @@ EffectLED* runner,*runnerSet = 0;  // effect to be executed on this step and con
 
 //EffectLED eLed for tests
 //Runner runner_0 (NUM_LEDS, leds); 
-//Runner runner_1 (NUM_LEDS, leds); 
 
 void setup() { 
 
@@ -55,7 +54,6 @@ void setup() {
   Serial.println("Ready To Receive Command's.");  // prints hello with ending line break 
 
   //effList[0] = &runner_0;
-  //effList[1] = &runner_1;  
 
 }
 
@@ -115,7 +113,7 @@ void parseCommand (char*  cmd) {
 
     //  create new effect 
     if (strcmp(cmd,EFFECT_NEW) == 0){     
-      EffectLED* effect =  new Runner (NUM_LEDS, leds); 
+      EffectLED* effect =  new Runner (NUM_LEDS, leds, interval); 
       insertEffect( effect );       // add new runner effect to the list of effects 
     }
     else if (strcmp(cmd,EFFECT_SET) == 0){      // start of configuration
@@ -130,7 +128,6 @@ void parseCommand (char*  cmd) {
       Serial.println ("SET is Done");
       runnerSet = NULL; 
     }
-
     else if (strcmp(cmd,EFFECT_LIST) == 0){      // size  : 100
       listEffects(); 
     }
@@ -182,7 +179,7 @@ void insertEffect (EffectLED* eff){
 // print all running effects effects 
 void listEffects (){
   int j =0; 
-  Serial.println("All running effects effects : "); 
+  Serial.println("All running effects : "); 
   for (int i = 0; i < LIST_SIZE; i++){
     if ( effList[i]){
       Serial.print("[");

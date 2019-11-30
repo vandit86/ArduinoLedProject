@@ -9,11 +9,11 @@
 EffectLED::EffectLED(){}
 
 // constructor receive number of leads on strip 
-EffectLED::EffectLED(int numLeds, CRGB * leds){
+EffectLED::EffectLED(int numLeds, CRGB * leds, long timeInLoop){
 
   this->leds = leds;  
   this->setNumLeds(numLeds);
-  //this->effectName = "";   
+  til = timeInLoop;   
   
 }
 

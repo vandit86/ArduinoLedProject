@@ -9,7 +9,7 @@ class EffectLED
 public : 
   
    EffectLED ();
-   EffectLED (int numLeds, CRGB* leds); 
+   EffectLED (int numLeds, CRGB* leds,long til); 
    ~EffectLED() {}  
   
   void setNumLeds (int);  
@@ -25,7 +25,7 @@ protected :
  	void clear_led();		// put leds to black 
  	String effectName; 
  	void trimStr (char* str);
- 	int til; // time in loop 
+ 	long til; // time in loop 
  		
 }; 
 
