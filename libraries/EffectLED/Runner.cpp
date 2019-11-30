@@ -1,7 +1,6 @@
 
-
 /*
-  EffectLED.cpp - Library for flashing Morse code.
+  Runner.cpp - Runner Class Effect with cobnfigurable params.
 */
 
 #include "Runner.h"
@@ -17,10 +16,12 @@ Runner::Runner(int numLeds, CRGB * leds) : EffectLED(numLeds, leds)
 	static uint8_t num = 0; 
 	this->color.setRGB(255,255,0); 
 	//this-> color.setColorCode (0); 
-	this-> size = 0; 
-	this-> period =-1;  
-	this->effectName = "Runner ";
-	this->effectName.concat(num++);   
+	this-> size = 1;                // defoult led size 
+	this-> period =100;             // defoult period 
+	this->effectName = "Runner ";   // Runner effect 
+	this->effectName.concat(num++); // create unic name for runner 
+	brightness = 50 ;               // default value for brightness  
+	str_color = "FFFF00";           // default str_color 
 }
 
 
@@ -36,12 +37,25 @@ void Runner::setSize(uint32_t s){
 // set color of leds 
 void Runner::setColor(uint32_t c){
 	this->color.setColorCode (c); 
-}   
+}
+
+// set number of leds to be controlled 
+void Runner::setNumLeds (int numLeds){
+	clear_led(); 
+	NUM_LEDS = numLeds; 
+}     
+
+// set time in loop for this effect 
+void Runner::setTimeInLoop(int time){ til = time; } 
+
+/// Set the global brightness scaling
+/// @param scale a 0-255 value for how much to scale all leds before writing them out
+void Runner::setBrightness(uint8_t scale) { 
+    brightness = scale; 
+}
 
 // return effect name 
-String Runner::getName(){
-	return this->effectName; 
-}
+String Runner::getName(){ return this->effectName; }
 
 
 // not blocking function 
@@ -59,8 +73,8 @@ void Runner::run() {
       for(uint8_t j = 0; j < size; ++j) {
         leds[pos + j] = this->color;
       }
-      FastLED.show();
-
+      FastLED.setBrightness(brightness);    // set brightness
+      FastLED.show();                       // show effect
       ++pos;
     } 
     else {
@@ -68,7 +82,6 @@ void Runner::run() {
     }
   }
 }
-
 
 /*
   Parsing the command and associate value received from CLI user 
@@ -87,14 +100,42 @@ String res = String (effectName);
       setSize (atoi(sep)); 
     }
     else if (strcmp(cmd,RUNNER_COLOR) == 0){      // color  : 100
+      int length = strlen(sep);
+      sep[length-1] = '\0'; 
+      str_color = String(sep);                    // save color value in string representation 
       setColor ((uint32_t)strtol(sep, NULL, 16));   
     } 
-
+     else if (strcmp(cmd,EFFECT_NUMLEDS) == 0){      // numl  : 100
+      setNumLeds(atoi(sep));   
+    }
+    else if (strcmp(cmd,EFFECT_LIGHT) == 0){      // light  : 100
+      int val = atoi(sep); 
+      if (val > 255 || val <0){
+        return res+"\t>> Brightness Value out of range "; 
+      }
+      setBrightness((uint8_t)val);   
+    } 
     else {
       return (res+" Undefined Command");
     }
    
   return res+"\t>> "+String(cmd)+" : "+String(sep);
 }
+
+
+// return the list of configurable parameters for this effect 
+String Runner::getListConfigParams(){
+    String res = String (effectName); 
+    res = res + " List of configurable Values:>> \n"; 
+    res = res + "\t"+ String(EFFECT_NUMLEDS) + " = " + NUM_LEDS + "\n"; 
+    res = res + "\t"+ String(RUNNER_PERIOD) + " = " + period + "\n"; 
+    res = res + "\t"+ String(RUNNER_SIZE) + " = " + size + "\n";
+    res = res + "\t"+ String(RUNNER_COLOR) + " = " + str_color + "\n"; 
+    res = res + "\t"+ String(EFFECT_LIGHT) + " = " + brightness + "\n"; 
+    
+    return res; 
+   
+}
+ 
 
 

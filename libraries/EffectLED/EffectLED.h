@@ -3,6 +3,7 @@
 
 #include "FastLED.h"
 
+
 class EffectLED 
 {
 public : 
@@ -15,6 +16,8 @@ public :
   virtual String getName() = 0;   // virtual function to return name of the effect 
   virtual void run() = 0; 		  // derived class defines whatto do 
   virtual String parseCommand (char*  cmd, char* val)=0; 
+  virtual String getListConfigParams()=0; 
+  virtual void setTimeInLoop(int tyme)=0; // 
   
 protected : 
  	int NUM_LEDS;			// number of leds 
@@ -22,6 +25,7 @@ protected :
  	void clear_led();		// put leds to black 
  	String effectName; 
  	void trimStr (char* str);
+ 	int til; // time in loop 
  		
 }; 
 
