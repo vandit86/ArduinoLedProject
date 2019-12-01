@@ -1,4 +1,10 @@
-
+/* 
+arduinoLedProject.ino 
+CLI interface to configure effects on led strip
+find more detailed description on attached .pdf file 
+sketch for use with EffectLed and FastLed librarys
+autor: Vadym Hapanchak 
+*/
 
 #include "FastLED.h"
 #include "EffectLED.h"
@@ -25,36 +31,37 @@ char inputCmd[CMD_SIZE + 1]={ 0 };                           // byffer to read c
 
 
 // constants Runner 
-char * const EFFECT_NEW = "new" ;       // new effect (example new:  -> create new Runner effect )
-char * const EFFECT_LIST = "list" ;     // new effect (example list:  -> show list of effects )
-char * const EFFECT_DEL = "del" ;       // new effect (example del:1  -> delete first effect on list)
-char * const EFFECT_SET = "set";
-char * const EFFECT_END = "end";
+char * const EFFECT_NEW =   "new" ;       // new effect (example new:  -> create new Runner effect )
+char * const EFFECT_LIST =  "list" ;     // new effect (example list:  -> show list of effects )
+char * const EFFECT_DEL =   "del" ;       // new effect (example del:1  -> delete first effect on list)
+char * const EFFECT_SET =   "set";
+char * const EFFECT_END =   "end";
 
-EffectLED* effList [LIST_SIZE] = {  NULL };      // list of effects  
-
-unsigned long previousMillis = 0;        // will store last time LED was updated
-const long interval = 5000;           // interval at which to blink (milliseconds)
-
-uint8_t exePos = 0;                  // execution position on array 
-EffectLED* runner,*runnerSet = 0;  // effect to be executed on this step and configured
-
-//EffectLED eLed for tests
-//Runner runner_0 (NUM_LEDS, leds); 
+EffectLED* effList [LIST_SIZE] = {  NULL };       // list of effects  
+unsigned long previousMillis = 0;                 // will store last time LED was updated
+const long interval = 5000;                       // interval at which to blink (milliseconds)
+uint8_t exePos = 0;                               // execution position on array 
+EffectLED* runner,*runnerSet = 0;                 // effect to be executed on this step and configured
+bool TEST = true ;                                // change this values to start with empty effect list 
 
 void setup() { 
 
-  FastLED.setBrightness(  BRIGHTNESS );
+  if (TEST){
+    //EffectLED eLed for tests
+    Runner* runnerTest = new Runner (NUM_LEDS, leds, interval);
+    runnerTest->setRandom(true);  // always_random values
+    effList[0] = runnerTest;      // add test effect to execution loop 
+
+
+  }
+
+  FastLED.setBrightness(BRIGHTNESS);
   FastLED.addLeds<WS2801, DATA_PIN, CLOCK_PIN, RBG>(leds, NUM_LEDS);
   //FastLED.clearData();  
-
 
   // serial communication 
   Serial.begin(9600);           // set up Serial library at 9600 bps
   Serial.println("Ready To Receive Command's.");  // prints hello with ending line break 
-
-  //effList[0] = &runner_0;
-
 }
 
 void loop() {
