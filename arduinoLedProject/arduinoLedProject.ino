@@ -42,7 +42,7 @@ unsigned long previousMillis = 0;                 // will store last time LED wa
 const long interval = 5000;                       // interval at which to blink (milliseconds)
 uint8_t exePos = 0;                               // execution position on array 
 EffectLED* runner,*runnerSet = 0;                 // effect to be executed on this step and configured
-bool TEST = true ;                                // change this values to start with empty effect list 
+bool TEST = false ;                                // change this values to start with empty effect list 
 
 void setup() { 
 
