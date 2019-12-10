@@ -22,10 +22,17 @@ public :
 protected : 
  	int NUM_LEDS;			// number of leds 
  	CRGB* leds;				// led strip to be controlled 
- 	void clear_led();		// put leds to black 
- 	String effectName; 
- 	void trimStr (char* str);
  	long til; // time in loop 
+ 	String effectName;
+ 	
+ 	void clear_led();		                                    // put leds to black  
+ 	void trimStr (char* str);
+ 	
+ 	void setPixel(int Pixel, byte red, byte green, byte blue);  // set color to one led 
+ 	void setAll(byte red, byte green, byte blue);               // set color to all leds  
+ 	void showStrip();                                           // same ass FastLED.show(); 
+               
+ 	
  		
 }; 
 

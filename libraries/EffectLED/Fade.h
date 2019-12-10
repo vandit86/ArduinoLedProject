@@ -1,23 +1,23 @@
-#ifndef __VAD_RunnerEffectLED_h
-#define __VAD_RunnerEffectLED_h
+#ifndef __VAD_FadeEffectLED_h
+#define __VAD_FadeEffectLED_h
 
 #include "EffectLED.h"
 //class EffectLED; 
-// constants Runner 
-char * const RUNNER_PERIOD = "period" ; 
-char * const RUNNER_SIZE = "size" ; 
-char * const RUNNER_COLOR = "color" ;
-char * const EFFECT_NUMLEDS = "numl" ; // number of leds used for effect
-char * const EFFECT_LIGHT = "light" ; // brightness
-char * const EFFECT_ALWAYS_RANDOM = "arand" ; //  (0;1)
-char * const EFFECT_RANDOM = "rand" ; // 
-// effect Runner 
-class Runner : public EffectLED {
+// constants Fade 
+char * const Fade_PERIOD = "period" ; 
+char * const Fade_SIZE = "size" ; 
+char * const Fade_COLOR = "color" ;
+char * const Fade_NUMLEDS = "numl" ; // number of leds used for Fade
+char * const Fade_LIGHT = "light" ; // brightness
+char * const Fade_ALWAYS_RANDOM = "arand" ; //  (0;1)
+char * const Fade_RANDOM = "rand" ; // 
+// Fade Fade 
+class Fade : public EffectLED {
 	
 	public :
-		Runner(); 
-		Runner (int numLeds, CRGB* leds, long til); 
-		~Runner (){}  
+		Fade(); 
+		Fade (int numLeds, CRGB* leds, long til); 
+		~Fade (){}  
 		virtual String getName(); 
 		virtual String getListConfigParams(); 
 		virtual void run();
@@ -32,7 +32,7 @@ class Runner : public EffectLED {
 		void assignRundomValues();          // function to assign random values to configurable class params  
 	
 	private : 
-		const char* name = "Runner";  	
+		const char* name = "Fade";  	
 		uint32_t period; 
 		uint32_t size;
 		CRGB color; 

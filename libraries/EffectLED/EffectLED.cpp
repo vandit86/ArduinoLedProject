@@ -38,6 +38,26 @@ void EffectLED::clear_led (){
 }
 
 
+void EffectLED::setPixel(int Pixel, byte red, byte green, byte blue) {
+   // FastLED
+   leds[Pixel].r = red;
+   leds[Pixel].g = green;
+   leds[Pixel].b = blue;
+}
+
+void EffectLED::setAll(byte red, byte green, byte blue) {
+  for(int i = 0; i < NUM_LEDS; i++ ) {
+    setPixel(i, red, green, blue);
+  }
+  showStrip();
+}
+
+void EffectLED::showStrip() {
+   // FastLED
+   FastLED.show();
+}
+
+
 // Auxiliary function 
 // Remove Spaces From String
 void EffectLED::trimStr (char* str){
